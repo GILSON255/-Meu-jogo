@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRIPTO HACK</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        @import url('https://docs.google.com/forms/d/e/1FAIpQLSczYcuOFd3cJG-zyI7ETb4KUbme5G94Uej-beQo3EhxiwN_EQ/viewform?usp=header');
         
         body {
             font-family: 'Share Tech Mono', monospace;
@@ -204,6 +204,32 @@
             50% { opacity: 1; }
             100% { opacity: 0; }
         }
+        .avaliar-button,
+.portal-button {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background-color: rgba(0, 30, 0, 0.5);
+    color: #0f0;
+    border: 1px solid #0f0;
+    padding: 12px 0;
+    font-size: 1rem;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 5px #0f0;
+    transition: all 0.3s;
+    text-decoration: none;
+    margin-top: 10px;
+}
+
+.avaliar-button:hover,
+.portal-button:hover {
+    background-color: rgba(0, 60, 0, 0.7);
+    box-shadow: 0 0 10px #0f0;
+}
     </style>
 </head>
 <body>
@@ -218,7 +244,7 @@
             <input type="text" maxlength="1" id="digit4" pattern="[0-9]" autocomplete="off">
         </div>
         
-        <button id="new-game">REINICIAR SISTEMA</button>
+        <a id="new-game" class="avaliar-button" href="https://forms.gle/Too2BGeAg7BQm9vA6" target="_blank">AVALIE NOSSO JOGO</a>
         
         <div class="message terminal-effect" id="message">_</div>
         
