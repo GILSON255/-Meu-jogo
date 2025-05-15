@@ -53,18 +53,6 @@
             border-radius: 5px;
         }
         
-        .game-container::before {
-            content: "";
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            background: linear-gradient(45deg, #0f0, transparent, #0f0);
-            z-index: -1;
-            opacity: 0.1;
-        }
-        
         .input-container {
             margin-bottom: 1.5rem;
             display: flex;
@@ -85,6 +73,13 @@
             font-family: 'Share Tech Mono', monospace;
             text-shadow: 0 0 5px #0f0;
             box-shadow: 0 0 5px #0f0 inset;
+            -moz-appearance: textfield;
+        }
+        
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
         
         input:focus {
@@ -182,11 +177,6 @@
             display: none;
         }
         
-        #new-game:hover {
-            background-color: rgba(0, 60, 0, 0.7);
-            box-shadow: 0 0 10px #0f0;
-        }
-        
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -199,7 +189,6 @@
             100% { opacity: 1; }
         }
         
-        /* Efeito de terminal */
         .terminal-effect::after {
             content: "|";
             animation: blink-cursor 0.7s infinite;
@@ -211,7 +200,6 @@
             100% { opacity: 0; }
         }
 
-        /* Responsividade para telas menores */
         @media (max-width: 480px) {
             .game-container {
                 padding: 1rem;
@@ -238,10 +226,10 @@
         <div class="attempts">TENTATIVAS: <span id="attempts">6</span></div>
         
         <div class="input-container">
-            <input type="text" maxlength="1" id="digit1" pattern="[0-9]" autocomplete="off">
-            <input type="text" maxlength="1" id="digit2" pattern="[0-9]" autocomplete="off">
-            <input type="text" maxlength="1" id="digit3" pattern="[0-9]" autocomplete="off">
-            <input type="text" maxlength="1" id="digit4" pattern="[0-9]" autocomplete="off">
+            <input type="number" min="0" max="9" maxlength="1" id="digit1" inputmode="numeric" autocomplete="off">
+            <input type="number" min="0" max="9" maxlength="1" id="digit2" inputmode="numeric" autocomplete="off">
+            <input type="number" min="0" max="9" maxlength="1" id="digit3" inputmode="numeric" autocomplete="off">
+            <input type="number" min="0" max="9" maxlength="1" id="digit4" inputmode="numeric" autocomplete="off">
         </div>
         
         <button id="new-game" class="avaliar-button">AVALIE NOSSO JOGO</button>
@@ -253,12 +241,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Game state
             let targetNumber = generateRandomNumber();
             let attemptsLeft = 6;
             let gameOver = false;
             
-            // DOM elements
             const digitInputs = [
                 document.getElementById('digit1'),
                 document.getElementById('digit2'),
@@ -270,15 +256,12 @@
             const attemptsElement = document.getElementById('attempts');
             const boardElement = document.getElementById('board');
             
-            // Initialize input behavior
             setupInputs();
             
-            // Event listeners
             newGameButton.addEventListener('click', function() {
                 window.open("https://forms.gle/Too2BGeAg7BQm9vA6", "_blank");
             });
             
-            // Generate a random 4-digit number with no repeating digits
             function generateRandomNumber() {
                 const digits = [];
                 while (digits.length < 4) {
@@ -290,10 +273,8 @@
                 return digits.join('');
             }
             
-            // Set up input behavior
             function setupInputs() {
                 digitInputs.forEach((input, index) => {
-                    // Auto-focus next input when a digit is entered
                     input.addEventListener('input', function() {
                         if (this.value.length === 1) {
                             if (index < 3) {
@@ -304,7 +285,6 @@
                         }
                     });
                     
-                    // Handle backspace to move to previous input
                     input.addEventListener('keydown', function(e) {
                         if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
                             digitInputs[index - 1].focus();
@@ -312,45 +292,35 @@
                     });
                 });
                 
-                // Focus first input on page load
                 digitInputs[0].focus();
             }
             
-            // Submit the current guess
             function submitGuess() {
                 if (gameOver) return;
                 
-                // Get the current guess
                 const guess = digitInputs.map(input => input.value).join('');
                 
-                // Validate the guess
-                if (guess.length !== 4 || !/^\d{4}$/.test(guess)) {
+                if (guess.length !== 4) {
                     showMessage('ERRO: INSIRA 4 DÍGITOS', 'error');
                     return;
                 }
                 
-                // Check for duplicate digits
                 const uniqueDigits = new Set(guess.split(''));
                 if (uniqueDigits.size < 4) {
                     showMessage('ERRO: DÍGITOS REPETIDOS', 'error');
                     return;
                 }
                 
-                // Process the guess
                 processGuess(guess);
             }
             
-            // Process a valid guess
             function processGuess(guess) {
-                // Decrement attempts
                 attemptsLeft--;
                 attemptsElement.textContent = attemptsLeft;
                 
-                // Create a new row for the guess
                 const row = document.createElement('div');
                 row.className = 'row';
                 
-                // Create cells for each digit
                 const guessDigits = guess.split('');
                 const targetDigits = targetNumber.split('');
                 const result = checkGuess(guess, targetNumber);
@@ -360,7 +330,6 @@
                     cell.className = 'cell';
                     cell.textContent = digit;
                     
-                    // Apply appropriate class based on result
                     if (result.correctPositions.includes(index)) {
                         cell.classList.add('correct');
                     } else if (result.correctDigits.includes(digit)) {
@@ -372,16 +341,13 @@
                     row.appendChild(cell);
                 });
                 
-                // Add the row to the board
                 boardElement.prepend(row);
                 
-                // Clear inputs
                 digitInputs.forEach(input => {
                     input.value = '';
                 });
                 digitInputs[0].focus();
                 
-                // Check for win or loss
                 if (guess === targetNumber) {
                     gameOver = true;
                     showMessage('SISTEMA HACKEADO! CÓDIGO: ' + targetNumber, 'success');
@@ -395,7 +361,6 @@
                 }
             }
             
-            // Check the guess against the target number
             function checkGuess(guess, target) {
                 const guessDigits = guess.split('');
                 const targetDigits = target.split('');
@@ -404,14 +369,12 @@
                     correctDigits: []
                 };
                 
-                // Check for correct positions
                 guessDigits.forEach((digit, index) => {
                     if (digit === targetDigits[index]) {
                         result.correctPositions.push(index);
                     }
                 });
                 
-                // Check for correct digits in wrong positions
                 guessDigits.forEach((digit, index) => {
                     if (!result.correctPositions.includes(index) && targetDigits.includes(digit)) {
                         result.correctDigits.push(digit);
@@ -421,7 +384,6 @@
                 return result;
             }
             
-            // Show a message to the player
             function showMessage(text, type) {
                 messageElement.textContent = text;
                 messageElement.className = 'message';
@@ -429,7 +391,6 @@
                     messageElement.classList.add(type);
                 }
                 
-                // Add terminal effect if not an error/success message
                 if (!type) {
                     messageElement.classList.add('terminal-effect');
                 } else {
@@ -437,7 +398,6 @@
                 }
             }
             
-            // Debug: log the target number (remove in production)
             console.log("Código alvo:", targetNumber);
         });
     </script>
