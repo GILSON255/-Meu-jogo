@@ -195,7 +195,18 @@
             letter-spacing: 0.1em;
         }
         
-        #new-game {
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .avaliar-button,
+        .home-button {
+            display: block;
+            width: 100%;
+            text-align: center;
             background-color: rgba(0, 30, 0, 0.5);
             color: #0f0;
             border: 1px solid #0f0;
@@ -203,16 +214,16 @@
             font-size: 1rem;
             border-radius: 2px;
             cursor: pointer;
-            width: 100%;
             font-weight: 400;
             letter-spacing: 0.1em;
             font-family: 'Share Tech Mono', monospace;
             text-shadow: 0 0 5px #0f0;
             transition: all 0.3s;
-            display: none;
+            text-decoration: none;
         }
-        
-        #new-game:hover {
+
+        .avaliar-button:hover,
+        .home-button:hover {
             background-color: rgba(0, 60, 0, 0.7);
             box-shadow: 0 0 10px #0f0;
         }
@@ -240,32 +251,6 @@
             50% { opacity: 1; }
             100% { opacity: 0; }
         }
-        .avaliar-button,
-.portal-button {
-    display: block;
-    width: 100%;
-    text-align: center;
-    background-color: rgba(0, 30, 0, 0.5);
-    color: #0f0;
-    border: 1px solid #0f0;
-    padding: 12px 0;
-    font-size: 1rem;
-    border-radius: 2px;
-    cursor: pointer;
-    font-weight: 400;
-    letter-spacing: 0.1em;
-    font-family: 'Share Tech Mono', monospace;
-    text-shadow: 0 0 5px #0f0;
-    transition: all 0.3s;
-    text-decoration: none;
-    margin-top: 10px;
-}
-
-.avaliar-button:hover,
-.portal-button:hover {
-    background-color: rgba(0, 60, 0, 0.7);
-    box-shadow: 0 0 10px #0f0;
-}
     </style>
 </head>
 <body>
@@ -281,7 +266,10 @@
             <input type="text" maxlength="1" id="digit4" pattern="[0-9]" autocomplete="off">
         </div>
         
-        <a id="new-game" class="avaliar-button" href="https://forms.gle/Too2BGeAg7BQm9vA6" target="_blank">AVALIE NOSSO JOGO</a>
+        <div class="button-container" id="button-container" style="display: none;">
+            <a id="home-button" class="home-button" href="#">VOLTAR AO INÍCIO</a>
+            <a id="avaliar-button" class="avaliar-button" href="https://forms.gle/Too2BGeAg7BQm9vA6" target="_blank">AVALIE NOSSO JOGO</a>
+        </div>
         
         <div class="message terminal-effect" id="message">_</div>
         
@@ -302,7 +290,9 @@
                 document.getElementById('digit3'),
                 document.getElementById('digit4')
             ];
-            const newGameButton = document.getElementById('new-game');
+            const buttonContainer = document.getElementById('button-container');
+            const homeButton = document.getElementById('home-button');
+            const avaliarButton = document.getElementById('avaliar-button');
             const messageElement = document.getElementById('message');
             const attemptsElement = document.getElementById('attempts');
             const boardElement = document.getElementById('board');
@@ -311,7 +301,10 @@
             setupInputs();
             
             // Event listeners
-            newGameButton.addEventListener('click', startNewGame);
+            homeButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = window.location.href; // Recarrega a página
+            });
             
             // Generate a random 4-digit number with no repeating digits
             function generateRandomNumber() {
@@ -420,11 +413,11 @@
                 if (guess === targetNumber) {
                     gameOver = true;
                     showMessage('SISTEMA HACKEADO! CÓDIGO: ' + targetNumber, 'success');
-                    newGameButton.style.display = 'block';
+                    buttonContainer.style.display = 'flex';
                 } else if (attemptsLeft === 0) {
                     gameOver = true;
                     showMessage('FALHA NA INVASÃO. CÓDIGO: ' + targetNumber, 'error');
-                    newGameButton.style.display = 'block';
+                    buttonContainer.style.display = 'flex';
                 } else {
                     showMessage('ANALISANDO... ' + attemptsLeft + ' TENTATIVAS RESTANTES');
                 }
@@ -470,27 +463,6 @@
                 } else {
                     messageElement.classList.remove('terminal-effect');
                 }
-            }
-            
-            // Start a new game
-            function startNewGame() {
-                targetNumber = generateRandomNumber();
-                attemptsLeft = 6;
-                gameOver = false;
-                
-                // Reset UI
-                digitInputs.forEach(input => {
-                    input.value = '';
-                });
-                digitInputs[0].focus();
-                boardElement.innerHTML = '';
-                messageElement.textContent = '_';
-                messageElement.className = 'message terminal-effect';
-                attemptsElement.textContent = '6';
-                newGameButton.style.display = 'none';
-                
-                // Debug: log the target number (remove in production)
-                console.log("Código alvo:", targetNumber);
             }
             
             // Debug: log the target number (remove in production)
