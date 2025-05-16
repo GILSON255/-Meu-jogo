@@ -398,12 +398,6 @@
     <div class="scanlines"></div>
     <div class="grid-overlay"></div>
     
-    <!-- Elementos de áudio (ocultos) -->
-    <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-mouse-click-close-1113.mp3" preload="auto"></audio>
-    <audio id="errorSound" src="https://assets.mixkit.co/sfx/preview/mixkit-warning-alarm-688.mp3" preload="auto"></audio>
-    <audio id="successSound" src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3" preload="auto"></audio>
-    <audio id="keySound" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-jump-arcade-game-239.mp3" preload="auto"></audio>
-    
     <div class="container">
         <div class="terminal">
             <div class="terminal-header">
@@ -443,12 +437,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Elementos de áudio
-            const clickSound = document.getElementById('clickSound');
-            const errorSound = document.getElementById('errorSound');
-            const successSound = document.getElementById('successSound');
-            const keySound = document.getElementById('keySound');
-            
             // Estado do jogo
             let targetNumber = generateRandomNumber();
             let attemptsLeft = 6;
@@ -468,24 +456,14 @@
             const attemptsElement = document.getElementById('attempts');
             const boardElement = document.getElementById('board');
             
-            // Configurar sons de clique nos botões
+            // Configuração inicial dos inputs
+            setupInputs();
+            
+            // Event listeners
             homeButton.addEventListener('click', function(e) {
                 e.preventDefault();
-                playSound(clickSound);
-                setTimeout(() => {
-                    window.location.reload();
-                }, 300);
+                window.location.reload();
             });
-            
-            avaliarButton.addEventListener('click', function() {
-                playSound(clickSound);
-            });
-            
-            // Função para tocar sons
-            function playSound(audioElement) {
-                audioElement.currentTime = 0;
-                audioElement.play().catch(e => console.log("Autoplay prevented: ", e));
-            }
             
             // Gerar número aleatório de 4 dígitos sem repetição
             function generateRandomNumber() {
@@ -505,7 +483,6 @@
                     // Focar no próximo input quando um dígito é inserido
                     input.addEventListener('input', function() {
                         if (this.value.length === 1) {
-                            playSound(keySound);
                             if (index < 3) {
                                 digitInputs[index + 1].focus();
                             } else {
@@ -525,26 +502,14 @@
                     input.addEventListener('keypress', function(e) {
                         if (!/[0-9]/.test(e.key)) {
                             e.preventDefault();
-                        } else {
-                            playSound(keySound);
                         }
-                    });
-                    
-                    // Som ao clicar no input
-                    input.addEventListener('click', function() {
-                        playSound(clickSound);
                     });
                 });
             }
             
-            // Inicializar inputs
-            setupInputs();
-            
             // Submeter tentativa
             function submitGuess() {
                 if (gameOver) return;
-                
-                playSound(clickSound);
                 
                 // Obter a tentativa atual
                 const guess = digitInputs.map(input => input.value).join('');
@@ -552,7 +517,6 @@
                 // Validar a tentativa
                 if (guess.length !== 4 || !/^\d{4}$/.test(guess)) {
                     showMessage('ERRO: INSIRA 4 DÍGITOS', 'error');
-                    playSound(errorSound);
                     return;
                 }
                 
@@ -560,7 +524,6 @@
                 const uniqueDigits = new Set(guess.split(''));
                 if (uniqueDigits.size < 4) {
                     showMessage('ERRO: DÍGITOS REPETIDOS DETECTADOS', 'error');
-                    playSound(errorSound);
                     return;
                 }
                 
@@ -615,16 +578,13 @@
                     showMessage('ACESSO CONCEDIDO. CÓDIGO: ' + targetNumber, 'success');
                     buttonContainer.style.display = 'flex';
                     document.querySelector('.status-led').style.backgroundColor = 'var(--primary)';
-                    playSound(successSound);
                 } else if (attemptsLeft === 0) {
                     gameOver = true;
                     showMessage('ACESSO NEGADO. CÓDIGO CORRETO: ' + targetNumber, 'error');
                     buttonContainer.style.display = 'flex';
                     document.querySelector('.status-led').style.backgroundColor = 'var(--error)';
-                    playSound(errorSound);
                 } else {
                     showMessage('ANALISANDO... ' + attemptsLeft + ' TENTATIVAS RESTANTES', 'info');
-                    playSound(clickSound);
                 }
             }
             
