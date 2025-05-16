@@ -194,6 +194,20 @@
             color: var(--primary);
             font-family: 'IBM Plex Mono', monospace;
             transition: all 0.3s ease;
+            /* Forçar teclado numérico em mobile */
+            inputmode: numeric;
+        }
+        
+        /* Esconder teclado padrão em mobile */
+        @media (max-width: 768px) {
+            .digit-input {
+                caret-color: transparent;
+                user-select: none;
+            }
+            
+            .digit-input:focus {
+                outline: none;
+            }
         }
         
         .digit-input:focus {
@@ -201,6 +215,45 @@
             border-color: var(--primary);
             box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
             background-color: rgba(0, 30, 20, 0.5);
+        }
+        
+        /* Teclado virtual para mobile */
+        .virtual-keyboard {
+            display: none;
+            margin-top: 1rem;
+        }
+        
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .keyboard-key {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 20, 15, 0.3);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            border-radius: 4px;
+            color: var(--primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .keyboard-key:active {
+            background-color: rgba(0, 255, 157, 0.2);
+        }
+        
+        /* Mostrar teclado virtual apenas em mobile */
+        @media (max-width: 768px) {
+            .virtual-keyboard {
+                display: block;
+            }
         }
         
         .game-board {
@@ -369,7 +422,7 @@
             100% { box-shadow: 0 0 10px rgba(0, 255, 157, 0.1); }
         }
         
-        /* Responsive adjustments */
+        /* Ajustes para dispositivos móveis */
         @media (max-width: 480px) {
             .container {
                 padding: 1rem;
@@ -386,6 +439,12 @@
             }
             
             .guess-cell {
+                width: 40px;
+                height: 40px;
+                font-size: 1.25rem;
+            }
+            
+            .keyboard-key {
                 width: 40px;
                 height: 40px;
                 font-size: 1.25rem;
@@ -422,10 +481,32 @@
             </div>
             
             <div class="input-group">
-                <input type="text" maxlength="1" id="digit1" class="digit-input" pattern="[0-9]" autocomplete="off" autofocus>
-                <input type="text" maxlength="1" id="digit2" class="digit-input" pattern="[0-9]" autocomplete="off">
-                <input type="text" maxlength="1" id="digit3" class="digit-input" pattern="[0-9]" autocomplete="off">
-                <input type="text" maxlength="1" id="digit4" class="digit-input" pattern="[0-9]" autocomplete="off">
+                <input type="text" inputmode="numeric" maxlength="1" id="digit1" class="digit-input" pattern="[0-9]" autocomplete="off" autofocus>
+                <input type="text" inputmode="numeric" maxlength="1" id="digit2" class="digit-input" pattern="[0-9]" autocomplete="off">
+                <input type="text" inputmode="numeric" maxlength="1" id="digit3" class="digit-input" pattern="[0-9]" autocomplete="off">
+                <input type="text" inputmode="numeric" maxlength="1" id="digit4" class="digit-input" pattern="[0-9]" autocomplete="off">
+            </div>
+            
+            <!-- Teclado virtual para mobile -->
+            <div class="virtual-keyboard">
+                <div class="keyboard-row">
+                    <div class="keyboard-key" data-key="1">1</div>
+                    <div class="keyboard-key" data-key="2">2</div>
+                    <div class="keyboard-key" data-key="3">3</div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="keyboard-key" data-key="4">4</div>
+                    <div class="keyboard-key" data-key="5">5</div>
+                    <div class="keyboard-key" data-key="6">6</div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="keyboard-key" data-key="7">7</div>
+                    <div class="keyboard-key" data-key="8">8</div>
+                    <div class="keyboard-key" data-key="9">9</div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="keyboard-key" data-key="0">0</div>
+                </div>
             </div>
             
             <div class="message-container" id="message">
@@ -468,6 +549,36 @@
             const attemptsElement = document.getElementById('attempts');
             const boardElement = document.getElementById('board');
             
+            // Configurar o teclado virtual
+            let currentInputIndex = 0;
+            const keyboardKeys = document.querySelectorAll('.keyboard-key');
+            
+            keyboardKeys.forEach(key => {
+                key.addEventListener('click', function() {
+                    const digit = this.getAttribute('data-key');
+                    if (currentInputIndex < digitInputs.length) {
+                        digitInputs[currentInputIndex].value = digit;
+                        playSound(keySound);
+                        
+                        // Mover para o próximo input
+                        if (currentInputIndex < digitInputs.length - 1) {
+                            currentInputIndex++;
+                        } else {
+                            // Se for o último dígito, submeter
+                            submitGuess();
+                        }
+                    }
+                });
+            });
+            
+            // Atualizar o índice do input atual quando clicar em um campo
+            digitInputs.forEach((input, index) => {
+                input.addEventListener('click', function() {
+                    currentInputIndex = index;
+                    playSound(clickSound);
+                });
+            });
+            
             // Configurar sons de clique nos botões
             homeButton.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -498,47 +609,6 @@
                 }
                 return digits.join('');
             }
-            
-            // Configurar comportamento dos inputs
-            function setupInputs() {
-                digitInputs.forEach((input, index) => {
-                    // Focar no próximo input quando um dígito é inserido
-                    input.addEventListener('input', function() {
-                        if (this.value.length === 1) {
-                            playSound(keySound);
-                            if (index < 3) {
-                                digitInputs[index + 1].focus();
-                            } else {
-                                submitGuess();
-                            }
-                        }
-                    });
-                    
-                    // Lidar com backspace para voltar ao input anterior
-                    input.addEventListener('keydown', function(e) {
-                        if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
-                            digitInputs[index - 1].focus();
-                        }
-                    });
-                    
-                    // Validar input (apenas números)
-                    input.addEventListener('keypress', function(e) {
-                        if (!/[0-9]/.test(e.key)) {
-                            e.preventDefault();
-                        } else {
-                            playSound(keySound);
-                        }
-                    });
-                    
-                    // Som ao clicar no input
-                    input.addEventListener('click', function() {
-                        playSound(clickSound);
-                    });
-                });
-            }
-            
-            // Inicializar inputs
-            setupInputs();
             
             // Submeter tentativa
             function submitGuess() {
@@ -607,6 +677,7 @@
                 digitInputs.forEach(input => {
                     input.value = '';
                 });
+                currentInputIndex = 0; // Resetar para o primeiro input
                 digitInputs[0].focus();
                 
                 // Verificar vitória ou derrota
