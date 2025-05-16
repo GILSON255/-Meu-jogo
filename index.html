@@ -3,247 +3,346 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRIPTO HACK</title>
+    <title>CRYPTOBREAK - Terminal Hacking Simulation</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+        
+        :root {
+            --primary: #00ff9d;
+            --secondary: #00b8ff;
+            --error: #ff3a3a;
+            --warning: #ffcc00;
+            --bg-dark: #0a0e12;
+            --bg-darker: #06090c;
+            --terminal-text: #e0e0e0;
+            --grid-color: rgba(0, 255, 157, 0.05);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         
         body {
-            font-family: 'Share Tech Mono', monospace;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            color: #0f0;
+            font-family: 'IBM Plex Mono', monospace;
+            background-color: var(--bg-dark);
+            color: var(--terminal-text);
             height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
             position: relative;
             overflow: hidden;
+            line-height: 1.6;
         }
-
-        body::before {
-            content: "";
+        
+        .noise {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('https://vivo.com.br/content/dam/vivo-sites/vivo-com-br/homepage/imagens/fotos/vivo-explica-diferencas-entre-hacker-e-cracker-o-que-sa-crackers-1605-600x400.jpg');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.15;
-            z-index: -2;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABOSURBVGhD7cExAQAwDMCg+zfdm1gQ+JFN2JmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZ2QcQYwIEdw8VKAAAAABJRU5ErkJggg==');
+            opacity: 0.03;
+            z-index: 0;
         }
-
-        body::after {
-            content: "";
+        
+        .scanlines {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #0a0a0a;
-            z-index: -3;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(0, 255, 157, 0.03) 50%,
+                transparent 100%
+            );
+            background-size: 100% 4px;
+            z-index: 1;
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
         }
         
         .grid-overlay {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100%;
+            height: 100%;
             background-image: 
-                linear-gradient(rgba(0, 255, 0, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 0, 0.05) 1px, transparent 1px);
-            background-size: 20px 20px;
-            z-index: -1;
-            opacity: 0.5;
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 24px 24px;
+            z-index: 0;
         }
         
-        h1 {
-            font-weight: 400;
-            font-size: 2.5rem;
-            margin: 0 0 1.5rem 0;
-            letter-spacing: 0.2em;
-            color: #0f0;
-            text-shadow: 0 0 5px #0f0;
-        }
-        
-        .game-container {
-            max-width: 350px;
+        .container {
+            width: 100%;
+            max-width: 600px;
             margin: 0 auto;
             padding: 2rem;
-            border: 1px solid #0f0;
-            box-shadow: 0 0 10px #0f0;
-            background-color: rgba(0, 0, 0, 0.8);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .terminal {
+            background-color: rgba(10, 14, 18, 0.85);
+            border: 1px solid rgba(0, 255, 157, 0.2);
+            border-radius: 4px;
+            box-shadow: 0 0 30px rgba(0, 255, 157, 0.1),
+                        inset 0 0 20px rgba(0, 255, 157, 0.05);
+            padding: 2rem;
             position: relative;
             overflow: hidden;
-            backdrop-filter: blur(2px);
+            backdrop-filter: blur(4px);
         }
         
-        .game-container::before {
+        .terminal::before {
             content: "";
             position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            background: linear-gradient(45deg, #0f0, transparent, #0f0);
-            z-index: -1;
-            opacity: 0.1;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                135deg,
+                rgba(0, 255, 157, 0.05) 0%,
+                transparent 50%,
+                rgba(0, 184, 255, 0.05) 100%
+            );
+            pointer-events: none;
         }
         
-        .input-container {
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(0, 255, 157, 0.2);
+        }
+        
+        .terminal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        
+        .terminal-subtitle {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            opacity: 0.8;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            animation: pulse 2s infinite;
+        }
+        
+        .status-text {
+            font-size: 0.75rem;
+            color: var(--terminal-text);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .attempts-counter {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background-color: rgba(0, 255, 157, 0.1);
+            border-radius: 2px;
+            font-size: 0.9rem;
             margin-bottom: 1.5rem;
         }
         
-        input {
+        .input-group {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        
+        .digit-input {
             width: 50px;
-            height: 50px;
-            font-size: 1.8rem;
+            height: 60px;
+            font-size: 1.75rem;
             text-align: center;
-            margin: 0 5px;
-            border: 1px solid #0f0;
-            border-radius: 2px;
-            background-color: rgba(0, 15, 0, 0.3);
-            color: #0f0;
-            font-weight: 400;
-            caret-color: #0f0;
-            font-family: 'Share Tech Mono', monospace;
-            text-shadow: 0 0 5px #0f0;
-            box-shadow: 0 0 5px #0f0 inset;
+            background-color: rgba(0, 20, 15, 0.3);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            border-radius: 4px;
+            color: var(--primary);
+            font-family: 'IBM Plex Mono', monospace;
+            transition: all 0.3s ease;
         }
         
-        input:focus {
+        .digit-input:focus {
             outline: none;
-            border-color: #0f0;
-            box-shadow: 0 0 10px #0f0 inset;
-            background-color: rgba(0, 30, 0, 0.5);
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+            background-color: rgba(0, 30, 20, 0.5);
         }
         
-        .board {
+        .game-board {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 0.75rem;
             margin: 2rem 0;
         }
         
-        .row {
+        .guess-row {
             display: flex;
             justify-content: center;
-            gap: 6px;
+            gap: 0.75rem;
         }
         
-        .cell {
+        .guess-cell {
             width: 50px;
             height: 50px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.8rem;
-            font-weight: 400;
-            border: 1px solid #333;
-            border-radius: 2px;
-            background-color: rgba(0, 15, 0, 0.2);
-            color: #0f0;
-            text-shadow: 0 0 5px #0f0;
+            font-size: 1.5rem;
+            font-weight: 500;
+            border: 1px solid rgba(0, 255, 157, 0.1);
+            border-radius: 4px;
+            background-color: rgba(0, 15, 10, 0.3);
+            color: var(--terminal-text);
+            position: relative;
+            overflow: hidden;
         }
         
-        .correct {
-            background-color: rgba(0, 80, 0, 0.7);
-            border-color: #0f0;
-            box-shadow: 0 0 10px #0f0;
-            animation: pulse 1s infinite;
+        .guess-cell::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                135deg,
+                rgba(0, 255, 157, 0.1) 0%,
+                transparent 100%
+            );
+            z-index: -1;
         }
         
-        .present {
-            background-color: rgba(80, 80, 0, 0.7);
-            border-color: #ff0;
-            color: #ff0;
-            text-shadow: 0 0 5px #ff0;
+        .guess-cell.correct {
+            background-color: rgba(0, 80, 50, 0.5);
+            border-color: var(--primary);
+            color: var(--primary);
+            animation: correct-pulse 1.5s infinite;
         }
         
-        .absent {
-            background-color: rgba(80, 0, 0, 0.7);
-            border-color: #f00;
-            color: #f00;
-            text-shadow: 0 0 5px #f00;
+        .guess-cell.present {
+            background-color: rgba(80, 80, 0, 0.5);
+            border-color: var(--warning);
+            color: var(--warning);
         }
         
-        .message {
-            margin: 1rem 0;
-            font-size: 1rem;
-            min-height: 1.5rem;
-            font-weight: 400;
-            text-shadow: 0 0 5px #0f0;
+        .guess-cell.absent {
+            background-color: rgba(80, 0, 0, 0.5);
+            border-color: var(--error);
+            color: var(--error);
+            opacity: 0.7;
         }
         
-        .success {
-            color: #0f0;
-            animation: blink 1s infinite;
-        }
-        
-        .error {
-            color: #f00;
-            text-shadow: 0 0 5px #f00;
-        }
-        
-        .attempts {
-            margin-bottom: 1.5rem;
+        .message-container {
+            min-height: 2rem;
+            margin: 1.5rem 0;
+            padding: 0.75rem;
+            border-radius: 4px;
             font-size: 0.9rem;
-            color: #0f0;
-            letter-spacing: 0.1em;
+            text-align: center;
         }
         
-        .button-container {
+        .message-success {
+            background-color: rgba(0, 80, 50, 0.3);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            animation: success-pulse 2s infinite;
+        }
+        
+        .message-error {
+            background-color: rgba(80, 0, 0, 0.3);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+        
+        .message-info {
+            background-color: rgba(0, 60, 80, 0.3);
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+        }
+        
+        .action-buttons {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
         }
-
-        .avaliar-button,
-        .home-button {
-            display: block;
-            width: 100%;
+        
+        .btn {
+            padding: 0.75rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 500;
             text-align: center;
-            background-color: rgba(0, 30, 0, 0.5);
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 12px 0;
-            font-size: 1rem;
-            border-radius: 2px;
-            cursor: pointer;
-            font-weight: 400;
+            text-transform: uppercase;
             letter-spacing: 0.1em;
-            font-family: 'Share Tech Mono', monospace;
-            text-shadow: 0 0 5px #0f0;
-            transition: all 0.3s;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
             text-decoration: none;
         }
-
-        .avaliar-button:hover,
-        .home-button:hover {
-            background-color: rgba(0, 60, 0, 0.7);
-            box-shadow: 0 0 10px #0f0;
+        
+        .btn-primary {
+            background-color: rgba(0, 255, 157, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .btn-primary:hover {
+            background-color: rgba(0, 255, 157, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.2);
         }
         
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        .btn-secondary {
+            background-color: rgba(0, 184, 255, 0.1);
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
         }
         
-        /* Efeito de terminal */
-        .terminal-effect::after {
+        .btn-secondary:hover {
+            background-color: rgba(0, 184, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 184, 255, 0.1);
+        }
+        
+        .typing-effect::after {
             content: "|";
             animation: blink-cursor 0.7s infinite;
+            color: var(--primary);
         }
         
         @keyframes blink-cursor {
@@ -251,39 +350,99 @@
             50% { opacity: 1; }
             100% { opacity: 0; }
         }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        @keyframes correct-pulse {
+            0% { box-shadow: 0 0 5px rgba(0, 255, 157, 0.3); }
+            50% { box-shadow: 0 0 15px rgba(0, 255, 157, 0.5); }
+            100% { box-shadow: 0 0 5px rgba(0, 255, 157, 0.3); }
+        }
+        
+        @keyframes success-pulse {
+            0% { box-shadow: 0 0 10px rgba(0, 255, 157, 0.1); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 157, 0.3); }
+            100% { box-shadow: 0 0 10px rgba(0, 255, 157, 0.1); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .terminal {
+                padding: 1.5rem;
+            }
+            
+            .digit-input {
+                width: 40px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+            
+            .guess-cell {
+                width: 40px;
+                height: 40px;
+                font-size: 1.25rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="noise"></div>
+    <div class="scanlines"></div>
     <div class="grid-overlay"></div>
-    <div class="game-container">
-        <h1>CRIPTO HACK</h1>
-        <div class="attempts"> TENTATIVAS RESTANTES: <span id="attempts">6</span></div>
-        
-        <div class="input-container">
-            <input type="text" maxlength="1" id="digit1" pattern="[0-9]" autocomplete="off">
-            <input type="text" maxlength="1" id="digit2" pattern="[0-9]" autocomplete="off">
-            <input type="text" maxlength="1" id="digit3" pattern="[0-9]" autocomplete="off">
-            <input type="text" maxlength="1" id="digit4" pattern="[0-9]" autocomplete="off">
+    
+    <div class="container">
+        <div class="terminal">
+            <div class="terminal-header">
+                <div>
+                    <div class="terminal-title">CRYPTOBREAK</div>
+                    <div class="terminal-subtitle">Simulação de Terminal de Hacking v1.2.5</div>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-led"></div>
+                    <div class="status-text">Ativo</div>
+                </div>
+            </div>
+            
+            <div class="attempts-counter">
+                TENTATIVAS RESTANTES: <span id="attempts">6</span>
+            </div>
+            
+            <div class="input-group">
+                <input type="text" maxlength="1" id="digit1" class="digit-input" pattern="[0-9]" autocomplete="off" autofocus>
+                <input type="text" maxlength="1" id="digit2" class="digit-input" pattern="[0-9]" autocomplete="off">
+                <input type="text" maxlength="1" id="digit3" class="digit-input" pattern="[0-9]" autocomplete="off">
+                <input type="text" maxlength="1" id="digit4" class="digit-input" pattern="[0-9]" autocomplete="off">
+            </div>
+            
+            <div class="message-container" id="message">
+                <span class="typing-effect">INSIRA O CÓDIGO DE ACESSO</span>
+            </div>
+            
+            <div class="game-board" id="board"></div>
+            
+            <div class="action-buttons" id="button-container" style="display: none;">
+                <a id="home-button" class="btn btn-primary" href="#">REINICIAR SISTEMA</a>
+                <a id="avaliar-button" class="btn btn-secondary" href="https://forms.gle/Too2BGeAg7BQm9vA6" target="_blank">ENVIAR FEEDBACK</a>
+            </div>
         </div>
-        
-        <div class="button-container" id="button-container" style="display: none;">
-            <a id="home-button" class="home-button" href="#">VOLTAR AO INÍCIO</a>
-            <a id="avaliar-button" class="avaliar-button" href="https://forms.gle/Too2BGeAg7BQm9vA6" target="_blank">AVALIE NOSSO JOGO</a>
-        </div>
-        
-        <div class="message terminal-effect" id="message">_</div>
-        
-        <div class="board" id="board"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Game state
+            // Estado do jogo
             let targetNumber = generateRandomNumber();
             let attemptsLeft = 6;
             let gameOver = false;
             
-            // DOM elements
+            // Elementos DOM
             const digitInputs = [
                 document.getElementById('digit1'),
                 document.getElementById('digit2'),
@@ -297,16 +456,16 @@
             const attemptsElement = document.getElementById('attempts');
             const boardElement = document.getElementById('board');
             
-            // Initialize input behavior
+            // Configuração inicial dos inputs
             setupInputs();
             
             // Event listeners
             homeButton.addEventListener('click', function(e) {
                 e.preventDefault();
-                window.location.href = window.location.href; // Recarrega a página
+                window.location.reload();
             });
             
-            // Generate a random 4-digit number with no repeating digits
+            // Gerar número aleatório de 4 dígitos sem repetição
             function generateRandomNumber() {
                 const digits = [];
                 while (digits.length < 4) {
@@ -318,10 +477,10 @@
                 return digits.join('');
             }
             
-            // Set up input behavior
+            // Configurar comportamento dos inputs
             function setupInputs() {
                 digitInputs.forEach((input, index) => {
-                    // Auto-focus next input when a digit is entered
+                    // Focar no próximo input quando um dígito é inserido
                     input.addEventListener('input', function() {
                         if (this.value.length === 1) {
                             if (index < 3) {
@@ -332,63 +491,67 @@
                         }
                     });
                     
-                    // Handle backspace to move to previous input
+                    // Lidar com backspace para voltar ao input anterior
                     input.addEventListener('keydown', function(e) {
                         if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
                             digitInputs[index - 1].focus();
                         }
                     });
+                    
+                    // Validar input (apenas números)
+                    input.addEventListener('keypress', function(e) {
+                        if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                        }
+                    });
                 });
-                
-                // Focus first input on page load
-                digitInputs[0].focus();
             }
             
-            // Submit the current guess
+            // Submeter tentativa
             function submitGuess() {
                 if (gameOver) return;
                 
-                // Get the current guess
+                // Obter a tentativa atual
                 const guess = digitInputs.map(input => input.value).join('');
                 
-                // Validate the guess
+                // Validar a tentativa
                 if (guess.length !== 4 || !/^\d{4}$/.test(guess)) {
                     showMessage('ERRO: INSIRA 4 DÍGITOS', 'error');
                     return;
                 }
                 
-                // Check for duplicate digits
+                // Verificar dígitos duplicados
                 const uniqueDigits = new Set(guess.split(''));
                 if (uniqueDigits.size < 4) {
-                    showMessage('ERRO: DÍGITOS REPETIDOS', 'error');
+                    showMessage('ERRO: DÍGITOS REPETIDOS DETECTADOS', 'error');
                     return;
                 }
                 
-                // Process the guess
+                // Processar a tentativa
                 processGuess(guess);
             }
             
-            // Process a valid guess
+            // Processar uma tentativa válida
             function processGuess(guess) {
-                // Decrement attempts
+                // Decrementar tentativas
                 attemptsLeft--;
                 attemptsElement.textContent = attemptsLeft;
                 
-                // Create a new row for the guess
+                // Criar nova linha para a tentativa
                 const row = document.createElement('div');
-                row.className = 'row';
+                row.className = 'guess-row';
                 
-                // Create cells for each digit
+                // Criar células para cada dígito
                 const guessDigits = guess.split('');
                 const targetDigits = targetNumber.split('');
                 const result = checkGuess(guess, targetNumber);
                 
                 guessDigits.forEach((digit, index) => {
                     const cell = document.createElement('div');
-                    cell.className = 'cell';
+                    cell.className = 'guess-cell';
                     cell.textContent = digit;
                     
-                    // Apply appropriate class based on result
+                    // Aplicar classe apropriada baseada no resultado
                     if (result.correctPositions.includes(index)) {
                         cell.classList.add('correct');
                     } else if (result.correctDigits.includes(digit)) {
@@ -400,30 +563,32 @@
                     row.appendChild(cell);
                 });
                 
-                // Add the row to the board
+                // Adicionar linha ao tabuleiro
                 boardElement.prepend(row);
                 
-                // Clear inputs
+                // Limpar inputs
                 digitInputs.forEach(input => {
                     input.value = '';
                 });
                 digitInputs[0].focus();
                 
-                // Check for win or loss
+                // Verificar vitória ou derrota
                 if (guess === targetNumber) {
                     gameOver = true;
-                    showMessage('SISTEMA HACKEADO! CÓDIGO: ' + targetNumber, 'success');
+                    showMessage('ACESSO CONCEDIDO. CÓDIGO: ' + targetNumber, 'success');
                     buttonContainer.style.display = 'flex';
+                    document.querySelector('.status-led').style.backgroundColor = 'var(--primary)';
                 } else if (attemptsLeft === 0) {
                     gameOver = true;
-                    showMessage('FALHA NA INVASÃO. CÓDIGO: ' + targetNumber, 'error');
+                    showMessage('ACESSO NEGADO. CÓDIGO CORRETO: ' + targetNumber, 'error');
                     buttonContainer.style.display = 'flex';
+                    document.querySelector('.status-led').style.backgroundColor = 'var(--error)';
                 } else {
-                    showMessage('ANALISANDO... ' + attemptsLeft + ' TENTATIVAS RESTANTES');
+                    showMessage('ANALISANDO... ' + attemptsLeft + ' TENTATIVAS RESTANTES', 'info');
                 }
             }
             
-            // Check the guess against the target number
+            // Verificar tentativa contra o código alvo
             function checkGuess(guess, target) {
                 const guessDigits = guess.split('');
                 const targetDigits = target.split('');
@@ -432,14 +597,14 @@
                     correctDigits: []
                 };
                 
-                // Check for correct positions
+                // Verificar posições corretas
                 guessDigits.forEach((digit, index) => {
                     if (digit === targetDigits[index]) {
                         result.correctPositions.push(index);
                     }
                 });
                 
-                // Check for correct digits in wrong positions
+                // Verificar dígitos corretos em posições erradas
                 guessDigits.forEach((digit, index) => {
                     if (!result.correctPositions.includes(index) && targetDigits.includes(digit)) {
                         result.correctDigits.push(digit);
@@ -449,25 +614,29 @@
                 return result;
             }
             
-            // Show a message to the player
+            // Mostrar mensagem para o jogador
             function showMessage(text, type) {
-                messageElement.textContent = text;
-                messageElement.className = 'message';
-                if (type) {
-                    messageElement.classList.add(type);
-                }
+                messageElement.innerHTML = '';
+                messageElement.classList.remove('typing-effect', 'message-success', 'message-error', 'message-info');
                 
-                // Add terminal effect if not an error/success message
-                if (!type) {
-                    messageElement.classList.add('terminal-effect');
+                const messageText = document.createElement('span');
+                messageText.textContent = text;
+                messageElement.appendChild(messageText);
+                
+                if (type === 'success') {
+                    messageElement.classList.add('message-success');
+                } else if (type === 'error') {
+                    messageElement.classList.add('message-error');
+                } else if (type === 'info') {
+                    messageElement.classList.add('message-info');
                 } else {
-                    messageElement.classList.remove('terminal-effect');
+                    messageElement.classList.add('typing-effect');
                 }
             }
             
-            // Debug: log the target number (remove in production)
+            // Debug: log do código alvo (remover em produção)
             console.log("Código alvo:", targetNumber);
         });
     </script>
 </body>
-</html>0
+</html>
